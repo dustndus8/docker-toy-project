@@ -1,0 +1,2 @@
+* * * * * /main/backup.sh # 일단 1분마다 index 갱신, 이후 하루1번 오후3시에로 변경
+* * * * * /main/image_backup.sh # 일단 5분마다 image 갱신 이후 하루1번 오후4시에로 변경

@@ -1,0 +1,35 @@
+version: '3.7'
+
+services: 
+  blog: 
+    image: 211.183.3.103:8888/proweb/web:blog
+    deploy: 
+      replicas: 2
+      placement: 
+        constraints: [node.role!=manager]
+      restart_policy: 
+        condition: on-failure
+        max_attempts: 2  
+    environment:
+      SERVICE_PORTS: 80 
+    networks: 
+     - blog
+
+  proxy: 
+    image: dockercloud/haproxy 
+    depends_on:
+      - blog
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports: 
+      - "8801:80"
+    networks: 
+      - blog
+    deploy:
+      mode: global 
+      placement: 
+        constraints: [node.role==manager]
+
+networks: 
+  blog:  
+    external: true

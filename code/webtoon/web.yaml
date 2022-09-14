@@ -1,0 +1,35 @@
+version: '3.7'
+
+services: 
+  webtoon: 
+    image: 211.183.3.103:8888/proweb/web:webtoon
+    deploy: 
+      replicas: 2
+      placement: 
+        constraints: [node.role!=manager]
+      restart_policy: 
+        condition: on-failure
+        max_attempts: 2  
+    environment:
+      SERVICE_PORTS: 80 
+    networks: 
+     - webtoon
+
+  proxy: 
+    image: dockercloud/haproxy 
+    depends_on:
+      - webtoon
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports: 
+      - "8802:80"
+    networks: 
+      - webtoon
+    deploy:
+      mode: global 
+      placement: 
+        constraints: [node.role==manager]
+
+networks: 
+  webtoon:  
+    external: true

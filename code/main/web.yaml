@@ -1,0 +1,35 @@
+version: '3.7'
+
+services: 
+  main: 
+    image: 211.183.3.103:8888/proweb/web:main
+    deploy: 
+      replicas: 3
+      placement: 
+        constraints: [node.role!=manager] 
+      restart_policy: 
+        condition: on-failure 
+        max_attempts: 2  
+    environment: 
+      SERVICE_PORTS: 80 
+    networks: 
+     - defaultnet
+
+  proxy: 
+    image: dockercloud/haproxy 
+    depends_on: 
+      - main
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports: 
+      - "8800:80" 
+    networks: 
+      - defaultnet
+    deploy: 
+      mode: global 
+      placement: 
+        constraints: [node.role==manager]
+
+networks: 
+  defaultnet: 
+    external: true
